@@ -11,7 +11,8 @@ const mapStateToProps = ({
     connected
   }
 }) => ({
-  messages
+  messages,
+  connected
 });
 
 const mapDispatchToProps = dispatch =>
@@ -28,16 +29,30 @@ export class Landing extends Component {
     super(props);
 
     this.state = {
-      message: null,
+      message: "",
+      name: "",
     }
 
     this.handleSend = this.handleSend.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.startChannel = this.startChannel.bind(this);
+    this.handleChangeNickname = this.handleChangeNickname.bind(this);
   }
 
-  componentDidMount() {
+  // componentDidMount() {
+  //   this.startChannel();
+  // }
+
+  startChannel() {
     const { startChannel } = this.props;
-    startChannel();
+    const { name } = this.state;
+    startChannel(name);
+  }
+
+  handleChangeNickname({ target: { value }}) {
+    this.setState({
+      name: value
+    });
   }
 
   handleChange({ target: { value }}) {
@@ -47,26 +62,40 @@ export class Landing extends Component {
   }
 
   handleSend() {
-    const { message } = this.state;
-
+    const { message, name } = this.state;
     const { sendMessage } = this.props;
-    sendMessage(message);
+
+    sendMessage({ message, name });
+    this.setState({
+      message: ""
+    });
   }
 
   render() {
-    const { messages, connected } = this.props;
+    const {
+      messages,
+      connected
+    } = this.props;
 
     if (connected) {
       return (
         <div>
           <ul>
-            {messages.map(message => <li key={message}>{message}</li>)}
+            {messages.map(message => <li key={Math.random()}><div><span>{message.message}</span><span>{message.name}</span></div></li>)}
           </ul>
-          <input placeholder="send a message" onSubmit={this.handleSend} onChange={this.handleChange} />
+          <input placeholder="send a message" value={this.state.message} onSubmit={this.handleSend} onChange={this.handleChange} />
           <button onClick={this.handleSend} type="submit">send</button>
         </div>
       );
     }
+
+    return (
+      <div>
+        <p>enter your name</p>
+        <input value={this.state.name} onChange={this.handleChangeNickname} />
+        <button onClick={this.startChannel}>Ready</button>
+      </div>
+    )
   }
 }
 
