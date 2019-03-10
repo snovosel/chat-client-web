@@ -31,12 +31,14 @@ export class Landing extends Component {
     this.state = {
       message: "",
       name: "",
+      room: ""
     }
 
     this.handleSend = this.handleSend.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.startChannel = this.startChannel.bind(this);
     this.handleChangeNickname = this.handleChangeNickname.bind(this);
+    this.handleRoomChange = this.handleRoomChange.bind(this);
   }
 
   // componentDidMount() {
@@ -45,8 +47,14 @@ export class Landing extends Component {
 
   startChannel() {
     const { startChannel } = this.props;
-    const { name } = this.state;
-    startChannel(name);
+    const { name, room } = this.state;
+    startChannel({ name, room });
+  }
+
+  handleRoomChange({ target: { value }}) {
+    this.setState({
+      room: value,
+    });
   }
 
   handleChangeNickname({ target: { value }}) {
@@ -67,7 +75,7 @@ export class Landing extends Component {
 
     sendMessage({ message, name });
     this.setState({
-      message: ""
+      message: "",
     });
   }
 
@@ -93,6 +101,8 @@ export class Landing extends Component {
       <div>
         <p>enter your name</p>
         <input value={this.state.name} onChange={this.handleChangeNickname} />
+        <p>enter your room</p>
+        <input value={this.state.room} onChange={this.handleRoomChange} />
         <button onClick={this.startChannel}>Ready</button>
       </div>
     )

@@ -1,8 +1,9 @@
 import io from "socket.io-client";
-import { put, call, take, race, takeEvery } from 'redux-saga/effects';
+import { put, call, take, race, takeEvery, select } from 'redux-saga/effects';
 import { eventChannel } from "redux-saga";
 
 export const START_CHANNEL = "START_CHANNEL";
+export const START_CHANNEL_SUCCESS = "START_CHANNEL_SUCCESS";
 export const STOP_CHANNEL = 'STOP_CHANNEL';
 
 export const SERVER_ON = "SERVER_ON";
@@ -13,6 +14,7 @@ export const NEW_MESSAGE = "NEW_MESSAGE";
 const initialState = {
   messages: [],
   connected: false,
+  room: null,
 };
 
 export function reducer(state = initialState, action) {
@@ -25,8 +27,17 @@ export function reducer(state = initialState, action) {
         messages: [...state.messages, payload]
       }
 
+    case START_CHANNEL: {
+      console.log('payload.room', payload.room)
+
+      return {
+        ...state,
+        room: payload.room,
+      };
+    }
+
+
     case SERVER_ON: {
-      console.log('server is on');
       return {
         ...state,
         connected: true,
@@ -38,7 +49,9 @@ export function reducer(state = initialState, action) {
   }
 };
 
-export const startChannel = name => ({ type: START_CHANNEL, payload: name });
+const getRoom = (state) => state.socket.room;
+
+export const startChannel = payload => ({ type: START_CHANNEL, payload });
 export const stopChannel = () => ({ type: STOP_CHANNEL });
 export const sendMessage = payload => ({
   type: SEND_MESSAGE,
@@ -49,10 +62,11 @@ export const sendMessage = payload => ({
 const socketServerURL = "localhost:8080";
 let socket;
 
-const connect = () => {
+const connect = (payload) => {
   socket = io(socketServerURL);
   return new Promise((resolve) => {
     socket.on('connect', () => {
+      socket.emit('room', payload);
       resolve(socket, "connect");
     });
   });
@@ -67,7 +81,9 @@ const createSocketChannel = socket => eventChannel((emit) => {
 
 function* listenServerSaga() {
   try {
-    const socket = yield call(connect);
+    const room = yield select(getRoom);
+    yield console.log('room', room);
+    const socket = yield call(connect, room);
     yield put({type: SERVER_ON });
     const socketChannel = yield call(createSocketChannel, socket);
 
@@ -80,7 +96,7 @@ function* listenServerSaga() {
   }
 }
 
-function* sendMessadgSaga({ payload }) {
+function* sendMessageSaga({ payload }) {
   try {
     yield socket.emit('message', payload);
   } catch(e) {
@@ -92,7 +108,7 @@ function* sendMessadgSaga({ payload }) {
 export const socketWatchers = function* () {
   while (true) {
     yield take(START_CHANNEL);
-    yield takeEvery(SEND_MESSAGE, sendMessadgSaga);
+    yield takeEvery(SEND_MESSAGE, sendMessageSaga);
     yield race({
       task: call(listenServerSaga),
       cancel: take(STOP_CHANNEL),
