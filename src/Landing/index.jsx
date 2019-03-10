@@ -8,6 +8,7 @@ import { startChannel, sendMessage } from '../socket.js';
 const mapStateToProps = ({
   socket: {
     messages,
+    connected
   }
 }) => ({
   messages
@@ -53,17 +54,19 @@ export class Landing extends Component {
   }
 
   render() {
-    const { messages } = this.props;
-    console.log('messages', messages);
-    return (
-      <div>
-        <ul>
-          {messages.map(message => <li key={message}>{message}</li>)}
-        </ul>
-        <input placeholder="send a message" onSubmit={this.handleSend} onChange={this.handleChange} />
-        <button onClick={this.handleSend} type="submit">send</button>
-      </div>
-    );
+    const { messages, connected } = this.props;
+
+    if (connected) {
+      return (
+        <div>
+          <ul>
+            {messages.map(message => <li key={message}>{message}</li>)}
+          </ul>
+          <input placeholder="send a message" onSubmit={this.handleSend} onChange={this.handleChange} />
+          <button onClick={this.handleSend} type="submit">send</button>
+        </div>
+      );
+    }
   }
 }
 
