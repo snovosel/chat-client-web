@@ -1,0 +1,21 @@
+@import '../styles/variables';
+
+.app-container {
+  padding: 10px;
+}
+
+.card-showcase {
+  display: flex;
+  height: 1000px;
+  width: 100%;
+
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+
+
+  & > * {
+    margin: 20px;
+  }
+
+}

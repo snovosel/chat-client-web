@@ -1,0 +1,22 @@
+@import '../../../styles/variables.scss';
+
+
+.container {
+  border: 0.5px solid $color-grayscale-7;
+  height: 500px;
+  width: 500px;
+  border-radius: 3px;
+  background-color: $color-secondary-6;
+
+  &.tall {
+    height: 800px;
+  }
+
+  &.wide {
+    width: 1000px;
+  }
+
+  &:hover {
+    border: 0.5px solid $color-grayscale-5;
+  }
+}
