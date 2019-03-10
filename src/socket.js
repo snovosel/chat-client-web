@@ -5,13 +5,14 @@ import { eventChannel } from "redux-saga";
 export const START_CHANNEL = "START_CHANNEL";
 export const STOP_CHANNEL = 'STOP_CHANNEL';
 
-export const CHANNEL_ON = "CHANNEL_ON";
+export const SERVER_ON = "SERVER_ON";
 
 export const SEND_MESSAGE = "SEND_MESSAGE";
 export const NEW_MESSAGE = "NEW_MESSAGE";
 
 const initialState = {
   messages: [],
+  connected: false,
 };
 
 export function reducer(state = initialState, action) {
@@ -24,6 +25,12 @@ export function reducer(state = initialState, action) {
         messages: [...state.messages, payload]
       }
 
+    case SERVER_ON:
+      return {
+        ...state,
+        connected: true,
+      }
+
     default:
       return state;
   }
@@ -31,7 +38,6 @@ export function reducer(state = initialState, action) {
 
 export const startChannel = () => ({ type: START_CHANNEL });
 export const stopChannel = () => ({ type: STOP_CHANNEL });
-
 export const sendMessage = message => ({
   type: SEND_MESSAGE,
   payload: message,
@@ -62,10 +68,10 @@ const createSocketChannel = socket => eventChannel((emit) => {
 
 function* listenServerSaga() {
   try {
-    yield put({ type: CHANNEL_ON });
     const socket = yield call(connect);
     const socketChannel = yield call(createSocketChannel, socket);
 
+    yield put({type: SERVER_ON });
     while (true) {
       const payload = yield take(socketChannel);
       yield put({type: NEW_MESSAGE, payload});
