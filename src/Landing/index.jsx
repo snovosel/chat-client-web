@@ -1,20 +1,22 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 // import CSSModules from 'react-css-modules';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import { startChannel, sendMessage } from "../socket.js";
+import { startChannel, sendMessage, stopChannel } from "../socket.js";
 
-const mapStateToProps = ({ socket: { messages, connected } }) => ({
+const mapStateToProps = ({ socket: { messages, connected, room } }) => ({
   messages,
-  connected
+  connected,
+  room
 });
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       startChannel,
-      sendMessage
+      sendMessage,
+      stopChannel
     },
     dispatch
   );
@@ -34,12 +36,18 @@ export class Landing extends Component {
     this.startChannel = this.startChannel.bind(this);
     this.handleChangeNickname = this.handleChangeNickname.bind(this);
     this.handleRoomChange = this.handleRoomChange.bind(this);
+    this.handleLeave = this.handleLeave.bind(this);
   }
 
   startChannel() {
     const { startChannel } = this.props;
     const { name, room } = this.state;
     startChannel({ name, room });
+  }
+
+  handleLeave() {
+    const { stopChannel } = this.props;
+    stopChannel();
   }
 
   handleRoomChange({ target: { value } }) {
@@ -71,31 +79,39 @@ export class Landing extends Component {
   }
 
   render() {
-    const { messages, connected } = this.props;
+    const { messages, connected, room } = this.props;
 
     if (connected) {
       return (
-        <div>
-          <ul>
-            {messages.map(message => (
-              <li key={Math.random()}>
-                <div>
-                  <span>{message.message}</span>
-                  <span>{message.name}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <input
-            placeholder="send a message"
-            value={this.state.message}
-            onSubmit={this.handleSend}
-            onChange={this.handleChange}
-          />
-          <button onClick={this.handleSend} type="submit">
-            send
-          </button>
-        </div>
+        <Fragment>
+          <div>
+            <button onClick={this.handleLeave} type="submit">
+              Leave
+            </button>
+            <ul>
+              {messages.map(message => (
+                <li key={Math.random()}>
+                  <div>
+                    <span>{message.message}</span>
+                    <span>{message.name}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <input
+              placeholder="send a message"
+              value={this.state.message}
+              onSubmit={this.handleSend}
+              onChange={this.handleChange}
+            />
+            <button onClick={this.handleSend} type="submit">
+              send
+            </button>
+          </div>
+          <div>
+            <p>You are connected to: {room}</p>
+          </div>
+        </Fragment>
       );
     }
 

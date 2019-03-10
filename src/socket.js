@@ -1,5 +1,14 @@
 import io from "socket.io-client";
-import { put, call, take, race, takeEvery, select } from "redux-saga/effects";
+import {
+  put,
+  call,
+  take,
+  race,
+  takeEvery,
+  select,
+  fork,
+  cancelled
+} from "redux-saga/effects";
 import { eventChannel } from "redux-saga";
 
 export const START_CHANNEL = "START_CHANNEL";
@@ -7,9 +16,15 @@ export const START_CHANNEL_SUCCESS = "START_CHANNEL_SUCCESS";
 export const STOP_CHANNEL = "STOP_CHANNEL";
 
 export const SERVER_ON = "SERVER_ON";
+export const SERVER_OFF = "SERVER_OFF";
+
+export const CHANNEL_OFF = "CHANNEL_OFF";
 
 export const SEND_MESSAGE = "SEND_MESSAGE";
 export const NEW_MESSAGE = "NEW_MESSAGE";
+
+export const JOIN_ROOM_SUCCESS = "JOIN_ROOM_SUCCESS";
+export const LEAVE_ROOM = "LEAVE_ROOM";
 
 const initialState = {
   messages: [],
@@ -27,19 +42,45 @@ export function reducer(state = initialState, action) {
         messages: [...state.messages, payload]
       };
 
-    case START_CHANNEL: {
+    case START_CHANNEL:
       return {
         ...state,
         room: payload.room
       };
-    }
 
-    case SERVER_ON: {
+    case CHANNEL_OFF:
+      return {
+        ...state,
+        room: null,
+        connected: false,
+        messages: []
+      };
+
+    case SERVER_ON:
       return {
         ...state,
         connected: true
       };
-    }
+
+    case SERVER_OFF:
+      return {
+        ...state,
+        connected: false,
+        messages: []
+      };
+
+    case LEAVE_ROOM:
+      return {
+        ...state,
+        room: null,
+        messages: []
+      };
+
+    case JOIN_ROOM_SUCCESS:
+      return {
+        ...state,
+        messages: [...state.messages, ...payload]
+      };
 
     default:
       return state;
@@ -50,6 +91,7 @@ const getRoom = state => state.socket.room;
 
 export const startChannel = payload => ({ type: START_CHANNEL, payload });
 export const stopChannel = () => ({ type: STOP_CHANNEL });
+
 export const sendMessage = payload => ({
   type: SEND_MESSAGE,
   payload
@@ -69,21 +111,40 @@ const connect = payload => {
   });
 };
 
+const disconnect = () => {
+  socket = io(socketServerURL);
+  return new Promise(resolve => {
+    socket.on("disconnect", () => {
+      resolve(socket);
+    });
+  });
+};
+
 const createSocketChannel = socket =>
   eventChannel(emit => {
     socket.on("message", payload => emit({ type: NEW_MESSAGE, payload }));
+    socket.on("join", payload => emit({ type: JOIN_ROOM_SUCCESS, payload }));
     return () => {
       socket.off("message", () => emit());
+      socket.off("join", () => emit());
     };
   });
+
+function* listenDisconnectSaga() {
+  while (true) {
+    yield call(disconnect);
+    yield put({ type: SERVER_OFF });
+  }
+}
 
 function* listenServerSaga() {
   try {
     const room = yield select(getRoom);
-    yield console.log("room", room);
     const socket = yield call(connect, room);
     yield put({ type: SERVER_ON });
     const socketChannel = yield call(createSocketChannel, socket);
+
+    yield fork(listenDisconnectSaga);
 
     while (true) {
       const { type, payload } = yield take(socketChannel);
@@ -91,6 +152,11 @@ function* listenServerSaga() {
     }
   } catch (e) {
     console.log("e", e);
+  } finally {
+    if (yield cancelled()) {
+      socket.disconnect(true);
+      yield put({ type: CHANNEL_OFF });
+    }
   }
 }
 
