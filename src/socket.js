@@ -25,22 +25,24 @@ export function reducer(state = initialState, action) {
         messages: [...state.messages, payload]
       }
 
-    case SERVER_ON:
+    case SERVER_ON: {
+      console.log('server is on');
       return {
         ...state,
         connected: true,
       }
+    }
 
     default:
       return state;
   }
 };
 
-export const startChannel = () => ({ type: START_CHANNEL });
+export const startChannel = name => ({ type: START_CHANNEL, payload: name });
 export const stopChannel = () => ({ type: STOP_CHANNEL });
-export const sendMessage = message => ({
+export const sendMessage = payload => ({
   type: SEND_MESSAGE,
-  payload: message,
+  payload,
 });
 
 // wrapping functions for socket events (connect, disconnect, reconnect)
@@ -51,37 +53,34 @@ const connect = () => {
   socket = io(socketServerURL);
   return new Promise((resolve) => {
     socket.on('connect', () => {
-      resolve(socket);
+      resolve(socket, "connect");
     });
   });
 };
 
 const createSocketChannel = socket => eventChannel((emit) => {
-  const handler = (data) => {
-    emit(data);
-  };
-  socket.on('message', handler);
+  socket.on('message', payload => emit({ type: NEW_MESSAGE, payload }));
   return () => {
-    socket.off('message', handler);
+    socket.off('message', () => emit());
   };
 });
 
 function* listenServerSaga() {
   try {
     const socket = yield call(connect);
+    yield put({type: SERVER_ON });
     const socketChannel = yield call(createSocketChannel, socket);
 
-    yield put({type: SERVER_ON });
     while (true) {
-      const payload = yield take(socketChannel);
-      yield put({type: NEW_MESSAGE, payload});
+      const { type, payload } = yield take(socketChannel);
+      yield put({type, payload});
     }
   } catch (e) {
     console.log('e', e);
   }
 }
 
-function* sendMessagSaga({ payload }) {
+function* sendMessadgSaga({ payload }) {
   try {
     yield socket.emit('message', payload);
   } catch(e) {
@@ -93,7 +92,7 @@ function* sendMessagSaga({ payload }) {
 export const socketWatchers = function* () {
   while (true) {
     yield take(START_CHANNEL);
-    yield takeEvery(SEND_MESSAGE, sendMessagSaga);
+    yield takeEvery(SEND_MESSAGE, sendMessadgSaga);
     yield race({
       task: call(listenServerSaga),
       cancel: take(STOP_CHANNEL),
