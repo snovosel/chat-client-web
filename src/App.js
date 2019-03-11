@@ -1,19 +1,17 @@
-import React, { Component } from 'react';
-import CSSModules from 'react-css-modules';
-import { Switch, Route } from 'react-router-dom';
+import React, { Component } from "react";
+import CSSModules from "react-css-modules";
 
-import Landing from 'Landing/index.jsx';
-import ComponentLibrary from './components';
+import Landing from "Landing/index.jsx";
 
-import styles from './App.scss';
+import styles from "./App.scss";
 
 class App extends Component {
   render() {
     return (
-      <Switch>
-        <Route exact path="/" component={Landing} />
-        <Route path="/components" component={ComponentLibrary} />
-      </Switch>
+      <div styleName="app-container">
+        <h1 styleName="header">Psst...</h1>
+        <Landing />
+      </div>
     );
   }
 }
