@@ -160,37 +160,59 @@ export class Landing extends Component {
   render() {
     const { messages, connected, room, username } = this.props;
 
+    console.log("username", username);
+
     if (connected) {
       return (
-        <Fragment>
-          <div styleName="container">
-            <button onClick={this.handleLeave} type="submit">
-              Leave
-            </button>
-            <ul>
+        <div styleName="container">
+          <div styleName="chatroom">
+            <div styleName="header">
+              <button
+                styleName="back active"
+                onClick={this.handleLeave}
+                type="submit"
+              >
+                leave
+              </button>
+              <div styleName="header-text">
+                <p>
+                  You are connected to: <b>{room}</b>
+                </p>
+              </div>
+            </div>
+            <ul styleName="message-list">
               {messages.map(message => (
                 <li key={Math.random()}>
-                  <div>
-                    <span>{message.message}</span>
-                    <span>{message.username}</span>
-                  </div>
+                  <span>
+                    <p>{message.message}</p>
+                  </span>
+                  <span styleName="name">
+                    <p>
+                      <b>{message.name}</b>
+                    </p>
+                  </span>
                 </li>
               ))}
             </ul>
-            <input
-              placeholder="send a message"
-              value={this.state.message}
-              onSubmit={this.handleSend}
-              onChange={this.handleChange}
-            />
-            <button onClick={this.handleSend} type="submit">
-              send
-            </button>
+            <div styleName="message">
+              <input
+                styleName="message-text"
+                value={this.state.message}
+                onSubmit={this.handleSend}
+                onChange={this.handleChange}
+              />
+              <button
+                styleName={`button ${
+                  this.state.message !== "" ? "active" : "disabled"
+                }`}
+                disabled={this.state.message === ""}
+                onClick={this.handleSend}
+              >
+                psst
+              </button>
+            </div>
           </div>
-          <div>
-            <p>You are connected to: {room}</p>
-          </div>
-        </Fragment>
+        </div>
       );
     } else {
       return <div styleName="container">{this.renderStep()}</div>;
