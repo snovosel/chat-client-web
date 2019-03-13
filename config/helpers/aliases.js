@@ -1,6 +1,6 @@
-var path = require('path');
+var path = require("path");
 
-var rootDir = path.resolve(__dirname, '../../src');
+var rootDir = path.resolve(__dirname, "../../src");
 
 module.exports = {
   components: path.resolve(__dirname, `${rootDir}/components`),
@@ -8,5 +8,5 @@ module.exports = {
   Inputs: path.resolve(__dirname, `${rootDir}/components/Inputs`),
   Layout: path.resolve(__dirname, `${rootDir}/components/Layout`),
   Index: path.resolve(__dirname, `${rootDir}/components/Index`),
-  Landing: path.resolve(__dirname, `${rootDir}/Landing`),
+  ChatRoom: path.resolve(__dirname, `${rootDir}/ChatRoom`)
 };
