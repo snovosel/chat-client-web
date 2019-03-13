@@ -1,14 +1,25 @@
-import React, { Component, Fragment } from "react";
-// import CSSModules from 'react-css-modules';
+import React, { Component } from "react";
+import CSSModules from "react-css-modules";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import { startChannel, sendMessage, stopChannel } from "../socket.js";
+import {
+  startChannel,
+  sendMessage,
+  stopChannel,
+  setUsername,
+  clearUsername
+} from "../socket.js";
 
-const mapStateToProps = ({ socket: { messages, connected, room } }) => ({
+import styles from "./index.styles.scss";
+
+const mapStateToProps = ({
+  socket: { messages, connected, room, username }
+}) => ({
   messages,
   connected,
-  room
+  room,
+  username
 });
 
 const mapDispatchToProps = dispatch =>
@@ -16,7 +27,9 @@ const mapDispatchToProps = dispatch =>
     {
       startChannel,
       sendMessage,
-      stopChannel
+      stopChannel,
+      setUsername,
+      clearUsername
     },
     dispatch
   );
@@ -37,12 +50,20 @@ export class Landing extends Component {
     this.handleChangeNickname = this.handleChangeNickname.bind(this);
     this.handleRoomChange = this.handleRoomChange.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
+    this.renderStep = this.renderStep.bind(this);
+    this.saveUsername = this.saveUsername.bind(this);
+    this.renderMessage = this.renderMessage.bind(this);
   }
 
   startChannel() {
     const { startChannel } = this.props;
     const { name, room } = this.state;
     startChannel({ name, room });
+  }
+
+  saveUsername() {
+    const { setUsername } = this.props;
+    setUsername(this.state.name);
   }
 
   handleLeave() {
@@ -78,56 +99,138 @@ export class Landing extends Component {
     });
   }
 
+  renderMessage({ message, name }) {
+    const { username } = this.props;
+    return (
+      <li styleName={name !== username ? "left" : "right"} key={Math.random()}>
+        <span>
+          <p>{message}</p>
+        </span>
+        <span styleName={name !== username ? "left-name" : "right-name"}>
+          {name !== username ? (
+            <p>
+              <b>{name}</b>
+            </p>
+          ) : null}
+        </span>
+      </li>
+    );
+  }
+
+  renderStep() {
+    const { room, username, setUsername, clearUsername } = this.props;
+
+    if (!room && !username) {
+      return (
+        <div styleName="input">
+          <span>
+            <p>
+              enter your <b>name</b>
+            </p>
+            <input
+              styleName="text"
+              value={this.state.name}
+              onChange={this.handleChangeNickname}
+            />
+          </span>
+          <button
+            styleName={`button ${
+              this.state.name !== "" ? "active" : "disabled"
+            }`}
+            disabled={this.state.name === ""}
+            onClick={this.saveUsername}
+          >
+            ready
+          </button>
+        </div>
+      );
+    } else if (!room && username !== null) {
+      return (
+        <div styleName="input">
+          <span>
+            <p>
+              enter your <b>room</b>
+            </p>
+            <input
+              styleName="text"
+              value={this.state.room}
+              onChange={this.handleRoomChange}
+            />
+          </span>
+          <div styleName="nav">
+            <button styleName="back" onClick={clearUsername}>
+              back
+            </button>
+            <button
+              styleName={`button ${
+                this.state.room !== "" ? "active" : "disabled"
+              }`}
+              disabled={this.state.room === ""}
+              onClick={this.startChannel}
+            >
+              ready
+            </button>
+          </div>
+        </div>
+      );
+    }
+  }
+
   render() {
-    const { messages, connected, room } = this.props;
+    const { messages, connected, room, username } = this.props;
 
     if (connected) {
       return (
-        <Fragment>
-          <div>
-            <button onClick={this.handleLeave} type="submit">
-              Leave
-            </button>
-            <ul>
-              {messages.map(message => (
-                <li key={Math.random()}>
-                  <div>
-                    <span>{message.message}</span>
-                    <span>{message.name}</span>
-                  </div>
-                </li>
-              ))}
+        <div styleName="container">
+          <div styleName="chatroom">
+            <div styleName="header">
+              <button
+                styleName="back active"
+                onClick={this.handleLeave}
+                type="submit"
+              >
+                leave
+              </button>
+              <div styleName="header-text">
+                <p>
+                  You are connected to: <b>{room}</b>
+                </p>
+              </div>
+            </div>
+            <ul styleName="message-list">
+              {messages.map(message => this.renderMessage(message))}
             </ul>
-            <input
-              placeholder="send a message"
-              value={this.state.message}
-              onSubmit={this.handleSend}
-              onChange={this.handleChange}
-            />
-            <button onClick={this.handleSend} type="submit">
-              send
-            </button>
+            <div styleName="message">
+              <input
+                styleName="message-text"
+                value={this.state.message}
+                onSubmit={this.handleSend}
+                onChange={this.handleChange}
+              />
+              <button
+                styleName={`button ${
+                  this.state.message !== "" ? "active" : "disabled"
+                }`}
+                disabled={this.state.message === ""}
+                onClick={this.handleSend}
+              >
+                psst
+              </button>
+            </div>
           </div>
-          <div>
-            <p>You are connected to: {room}</p>
-          </div>
-        </Fragment>
+        </div>
       );
+    } else {
+      return <div styleName="container">{this.renderStep()}</div>;
     }
-
-    return (
-      <div>
-        <p>enter your name</p>
-        <input value={this.state.name} onChange={this.handleChangeNickname} />
-        <p>enter your room</p>
-        <input value={this.state.room} onChange={this.handleRoomChange} />
-        <button onClick={this.startChannel}>Ready</button>
-      </div>
-    );
   }
 }
+
+const LandingStyled = CSSModules(Landing, styles, {
+  allowMultiple: true
+});
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Landing);
+)(LandingStyled);

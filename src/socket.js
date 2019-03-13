@@ -26,10 +26,14 @@ export const NEW_MESSAGE = "NEW_MESSAGE";
 export const JOIN_ROOM_SUCCESS = "JOIN_ROOM_SUCCESS";
 export const LEAVE_ROOM = "LEAVE_ROOM";
 
+export const SET_USERNAME = "SET_USERNAME";
+export const CLEAR_USERNAME = "CLEAR_USERNAME";
+
 const initialState = {
   messages: [],
   connected: false,
-  room: null
+  room: null,
+  username: null
 };
 
 export function reducer(state = initialState, action) {
@@ -39,7 +43,7 @@ export function reducer(state = initialState, action) {
     case NEW_MESSAGE:
       return {
         ...state,
-        messages: [...state.messages, payload]
+        messages: [payload, ...state.messages]
       };
 
     case START_CHANNEL:
@@ -82,6 +86,18 @@ export function reducer(state = initialState, action) {
         messages: [...state.messages, ...payload]
       };
 
+    case SET_USERNAME:
+      return {
+        ...state,
+        username: payload
+      };
+
+    case CLEAR_USERNAME:
+      return {
+        ...state,
+        username: null
+      };
+
     default:
       return state;
   }
@@ -95,6 +111,15 @@ export const stopChannel = () => ({ type: STOP_CHANNEL });
 export const sendMessage = payload => ({
   type: SEND_MESSAGE,
   payload
+});
+
+export const setUsername = payload => ({
+  type: SET_USERNAME,
+  payload
+});
+
+export const clearUsername = () => ({
+  type: CLEAR_USERNAME
 });
 
 // wrapping functions for socket events (connect, disconnect, reconnect)
