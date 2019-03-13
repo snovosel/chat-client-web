@@ -43,7 +43,7 @@ export function reducer(state = initialState, action) {
     case NEW_MESSAGE:
       return {
         ...state,
-        messages: [...state.messages, payload]
+        messages: [payload, ...state.messages]
       };
 
     case START_CHANNEL:

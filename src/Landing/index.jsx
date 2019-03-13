@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import CSSModules from "react-css-modules";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -52,6 +52,7 @@ export class Landing extends Component {
     this.handleLeave = this.handleLeave.bind(this);
     this.renderStep = this.renderStep.bind(this);
     this.saveUsername = this.saveUsername.bind(this);
+    this.renderMessage = this.renderMessage.bind(this);
   }
 
   startChannel() {
@@ -96,6 +97,24 @@ export class Landing extends Component {
     this.setState({
       message: ""
     });
+  }
+
+  renderMessage({ message, name }) {
+    const { username } = this.props;
+    return (
+      <li styleName={name !== username ? "left" : "right"} key={Math.random()}>
+        <span>
+          <p>{message}</p>
+        </span>
+        <span styleName={name !== username ? "left-name" : "right-name"}>
+          {name !== username ? (
+            <p>
+              <b>{name}</b>
+            </p>
+          ) : null}
+        </span>
+      </li>
+    );
   }
 
   renderStep() {
@@ -160,8 +179,6 @@ export class Landing extends Component {
   render() {
     const { messages, connected, room, username } = this.props;
 
-    console.log("username", username);
-
     if (connected) {
       return (
         <div styleName="container">
@@ -181,18 +198,7 @@ export class Landing extends Component {
               </div>
             </div>
             <ul styleName="message-list">
-              {messages.map(message => (
-                <li key={Math.random()}>
-                  <span>
-                    <p>{message.message}</p>
-                  </span>
-                  <span styleName="name">
-                    <p>
-                      <b>{message.name}</b>
-                    </p>
-                  </span>
-                </li>
-              ))}
+              {messages.map(message => this.renderMessage(message))}
             </ul>
             <div styleName="message">
               <input
