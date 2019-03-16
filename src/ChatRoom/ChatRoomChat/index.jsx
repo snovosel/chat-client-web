@@ -29,8 +29,8 @@ class ChatRoomChat extends Component {
   }
 
   handleSend() {
-    const { message, name, room } = this.state;
-    const { sendMessage } = this.props;
+    const { message } = this.state;
+    const { sendMessage, room, name } = this.props;
 
     sendMessage({ message, name, room });
     this.setState({
@@ -58,6 +58,8 @@ class ChatRoomChat extends Component {
 
   render() {
     const { room, messages } = this.props;
+
+    console.log("messages", messages);
 
     return (
       <div styleName="container">
