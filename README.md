@@ -11,7 +11,7 @@ Create and scale a chat application user-interface with minimal depencies and to
 Clone this repo and run the following commands:
 
 ```
-npm install && yarn
+npm install
 ```
 
 To build for a production environment:
