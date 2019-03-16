@@ -22,16 +22,8 @@ export function initializeStore(initialState) {
 
   sagaMiddleware.run(rootSaga);
 
-  // if (module.hot) {
-  //   console.log('is module hot');
-  //   module.hot.accept("./rootReducer.js", () => {
-  //     store.replaceReducer("./rootReducer.js");
-  //   });
-  // }
-
   return store;
 }
 
 export const store = initializeStore();
-
 export default store;

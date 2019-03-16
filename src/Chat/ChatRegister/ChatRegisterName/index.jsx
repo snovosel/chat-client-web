@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import ChatRegisterStep from "../ChatRegisterStep/index.jsx";
 import ChatRegisterStepButton from "../ChatRegisterStep/ChatRegisterStepButton/index.jsx";

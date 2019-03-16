@@ -1,5 +1,4 @@
-import React, { Component, Fragment } from "react";
-import CSSModules from "react-css-modules";
+import React, { Fragment } from "react";
 
 import ChatRegisterStep from "../ChatRegisterStep/index.jsx";
 import ChatRegisterStepButton from "../ChatRegisterStep/ChatRegisterStepButton/index.jsx";

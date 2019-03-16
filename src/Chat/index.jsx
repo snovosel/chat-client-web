@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import CSSModules from "react-css-modules";
+import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
