@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import CSSModules from "react-css-modules";
 
+import ChatMessage from "./ChatMessage/index.jsx";
+
 import styles from "./index.styles.scss";
 
 class ChatRoom extends Component {
@@ -14,7 +16,6 @@ class ChatRoom extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSend = this.handleSend.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
-    this.renderMessage = this.renderMessage.bind(this);
   }
 
   handleChange({ target: { value } }) {
@@ -30,34 +31,17 @@ class ChatRoom extends Component {
 
   handleSend() {
     const { message } = this.state;
-    const { sendMessage, room, name } = this.props;
+    const { sendMessage, room, currentUser } = this.props;
 
-    sendMessage({ message, name, room });
+    sendMessage({ message, username: currentUser, room });
     this.setState({
       message: ""
     });
   }
 
-  renderMessage({ message, name }) {
-    const { username } = this.props;
-    return (
-      <li styleName={name !== username ? "left" : "right"} key={Math.random()}>
-        <span>
-          <p>{message}</p>
-        </span>
-        <span styleName={name !== username ? "left-name" : "right-name"}>
-          {name !== username ? (
-            <p>
-              <b>{name}</b>
-            </p>
-          ) : null}
-        </span>
-      </li>
-    );
-  }
-
   render() {
     const { room, messages } = this.props;
+    const { currentUser } = this.props;
 
     return (
       <div styleName="container">
@@ -77,7 +61,13 @@ class ChatRoom extends Component {
             </div>
           </div>
           <ul styleName="message-list">
-            {messages.map(message => this.renderMessage(message))}
+            {messages.map(message => (
+              <ChatMessage
+                key={Math.random()}
+                messageInfo={message}
+                currentUser={currentUser}
+              />
+            ))}
           </ul>
           <div styleName="message">
             <input

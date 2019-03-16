@@ -1,37 +1,62 @@
-// use immuatbility-helper as much as possible here
-// import { update } from 'immutability-helper';
+export const START_CHANNEL = "START_CHANNEL";
+export const STOP_CHANNEL = "STOP_CHANNEL";
 
-const duckRoot = "Landing/";
-export const ADD_COUNT = `${duckRoot}/ADD_COUNT`;
-export const SHOW_COUNT = `${duckRoot}/SHOW_COUNT`;
+export const CHANNEL_ON = "CHANNEL_ON";
+
+export const CHANNEL_OFF = "CHANNEL_OFF";
+
+export const SEND_MESSAGE = "SEND_MESSAGE";
+export const NEW_MESSAGE = "NEW_MESSAGE";
 
 const initialState = {
-  title: 'LandingTitle',
-  count: 0,
+  messages: [],
+  connected: false,
+  room: null,
+  currentUser: null
 };
 
 export function reducer(state = initialState, action) {
-  switch(action.type) {
-    case 'SHOW_COUNT':
-      return state.count;
+  const { type, payload } = action;
 
-    case ADD_COUNT: {
+  switch (type) {
+    case NEW_MESSAGE:
       return {
         ...state,
-        count: state.count + 1,
-      }
-    }
+        messages: [payload, ...state.messages]
+      };
 
+    case START_CHANNEL:
+      return {
+        ...state,
+        currentUser: payload.name,
+        room: payload.room
+      };
+
+    case CHANNEL_OFF:
+      return {
+        ...state,
+        room: null,
+        connected: false,
+        messages: []
+      };
+
+    case CHANNEL_ON:
+      return {
+        ...state,
+        connected: true
+      };
 
     default:
       return state;
   }
 }
 
-export const showCount = () => ({
-  type: SHOW_COUNT
-});
+export const getRoom = state => state.chat.room;
 
-export const addCount = () => ({
-  type: ADD_COUNT
+export const startChannel = payload => ({ type: START_CHANNEL, payload });
+export const stopChannel = () => ({ type: STOP_CHANNEL });
+
+export const sendMessage = payload => ({
+  type: SEND_MESSAGE,
+  payload
 });

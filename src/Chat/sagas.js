@@ -1,36 +1,94 @@
-// import { takeEvery, put, call, all } from 'redux-saga/effects';
+import io from "socket.io-client";
+import {
+  put,
+  call,
+  take,
+  race,
+  takeEvery,
+  select,
+  fork,
+  cancelled
+} from "redux-saga/effects";
+import { eventChannel } from "redux-saga";
 
-import { takeEvery } from 'redux-saga/effects';
+import * as DUCKS from "./ducks.js";
 
-// import { GetRequest } from "../api.js";
+const socketServerURL = "localhost:8080";
+let socket;
 
-import { SHOW_COUNT } from './ducks.js';
+export const connect = payload => {
+  socket = io(socketServerURL);
+  return new Promise(resolve => {
+    socket.on("connect", () => {
+      socket.emit("room", payload);
+      resolve(socket, "connect");
+    });
+  });
+};
 
-// export function* makeApiCallAsync() {
-//    try {
-//       const fileNames = yield Gallery();
-//       if (fileNames.data.length !== 0) {
-//         yield fileNames.data.map(file => call(getPhotoForDownloadAsync, file))
-//       }
-//       yield;
-//    } catch (e) {
-//       console.log("failure on getPhotosAsync", e);
-//    }
-// }
+export const disconnect = () => {
+  socket = io(socketServerURL);
+  return new Promise(resolve => {
+    socket.on("disconnect", () => {
+      resolve(socket);
+    });
+  });
+};
 
-export function* makeApiCallAsync() {
-  try {
-    yield console.log("api call success");
-  } catch (e) {
-    console.log("api call failure");
+export const createSocketChannel = socket =>
+  eventChannel(emit => {
+    socket.on("message", payload => emit({ type: DUCKS.NEW_MESSAGE, payload }));
+    return () => {
+      socket.off("message", () => emit());
+      socket.off("join", () => emit());
+    };
+  });
+
+function* listenDisconnectSaga() {
+  while (true) {
+    yield call(disconnect);
   }
 }
 
-export const watchers = [
-  function* watchApiCall() {
-    // yield takeEvery(API_CALL, makeApiCallAsync);
-    yield takeEvery(SHOW_COUNT, makeApiCallAsync);
-  },
-]
+function* listenServerSaga() {
+  try {
+    const room = yield select(DUCKS.getRoom);
+    const socket = yield call(connect, room);
+    yield put({ type: DUCKS.CHANNEL_ON });
+    const socketChannel = yield call(createSocketChannel, socket);
 
-export default watchers;
+    yield fork(listenDisconnectSaga);
+
+    while (true) {
+      const { type, payload } = yield take(socketChannel);
+      yield put({ type, payload });
+    }
+  } catch (e) {
+    console.log("e listenServerSaga", e);
+  } finally {
+    if (yield cancelled()) {
+      socket.disconnect(true);
+      yield put({ type: DUCKS.CHANNEL_OFF });
+    }
+  }
+}
+
+function* sendMessageSaga({ payload }) {
+  try {
+    yield socket.emit("message", payload);
+  } catch (e) {
+    console.log("err", e);
+  }
+}
+
+// saga listens for start and stop actions
+export const chatWatchers = function*() {
+  while (true) {
+    yield take(DUCKS.START_CHANNEL);
+    yield takeEvery(DUCKS.SEND_MESSAGE, sendMessageSaga);
+    yield race({
+      task: call(listenServerSaga),
+      cancel: take(DUCKS.STOP_CHANNEL)
+    });
+  }
+};
