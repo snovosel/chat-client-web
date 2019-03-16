@@ -3,7 +3,7 @@ import CSSModules from "react-css-modules";
 
 import styles from "./index.styles.scss";
 
-class ChatRoomChat extends Component {
+class ChatRoom extends Component {
   constructor(props) {
     super(props);
 
@@ -59,8 +59,6 @@ class ChatRoomChat extends Component {
   render() {
     const { room, messages } = this.props;
 
-    console.log("messages", messages);
-
     return (
       <div styleName="container">
         <div styleName="chatroom">
@@ -104,8 +102,8 @@ class ChatRoomChat extends Component {
   }
 }
 
-const ChatRoomChatStyled = CSSModules(ChatRoomChat, styles, {
+const ChatRoomStyled = CSSModules(ChatRoom, styles, {
   allowMultiple: true
 });
 
-export default ChatRoomChatStyled;
+export default ChatRoomStyled;

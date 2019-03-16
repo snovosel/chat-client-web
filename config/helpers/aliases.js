@@ -8,5 +8,5 @@ module.exports = {
   Inputs: path.resolve(__dirname, `${rootDir}/components/Inputs`),
   Layout: path.resolve(__dirname, `${rootDir}/components/Layout`),
   Index: path.resolve(__dirname, `${rootDir}/components/Index`),
-  ChatRoom: path.resolve(__dirname, `${rootDir}/ChatRoom`)
+  Chat: path.resolve(__dirname, `${rootDir}/Chat`)
 };

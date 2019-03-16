@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import CSSModules from "react-css-modules";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import Wizard from "@snovosel/react-wizard";
 
 import {
   startChannel,
@@ -11,7 +12,7 @@ import {
   clearUsername
 } from "../socket.js";
 
-import ChatRoomChat from "./ChatRoomChat/index.jsx";
+import ChatRoom from "./ChatRoom/index.jsx";
 
 import styles from "./index.styles.scss";
 
@@ -36,7 +37,43 @@ const mapDispatchToProps = dispatch =>
     dispatch
   );
 
-export class Landing extends Component {
+const signInSteps = [
+  () => (
+    <div styleName="input">
+      <span>
+        <p>
+          enter your <b>name</b>
+        </p>
+        <input styleName="text" />
+      </span>
+      <button styleName={`button active`}>ready</button>
+    </div>
+  ),
+  () => (
+    <div styleName="input">
+      <span>
+        <p>
+          enter your <b>room</b>
+        </p>
+        <input styleName="text" />
+      </span>
+      <div styleName="nav">
+        <button styleName="back" onClick={clearUsername}>
+          back
+        </button>
+        <button
+          styleName={`button ${this.state.room !== "" ? "active" : "disabled"}`}
+          disabled={this.state.room === ""}
+          onClick={this.startChannel}
+        >
+          ready
+        </button>
+      </div>
+    </div>
+  )
+];
+
+export class Chat extends Component {
   constructor(props) {
     super(props);
 
@@ -139,18 +176,26 @@ export class Landing extends Component {
     const { connected, ...restProps } = this.props;
 
     if (connected) {
-      return <ChatRoomChat {...restProps} />;
+      return <ChatRoom {...restProps} />;
     } else {
-      return <div styleName="container">{this.renderStep()}</div>;
+      // return <div styleName="container">{this.renderStep()}</div>;
+      return (
+        <Wizard
+          steps={signInSteps}
+          callBack={state => console.log("state callback", state)}
+        >
+          {({ CurrentStep, ...restWizardValues }) => (
+            <CurrentStep {...restWizardValues} />
+          )}
+        </Wizard>
+      );
     }
   }
 }
 
-const LandingStyled = CSSModules(Landing, styles, {
-  allowMultiple: true
-});
+const ChatStyled = CSSModules(Chat, styles);
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(LandingStyled);
+)(ChatStyled);

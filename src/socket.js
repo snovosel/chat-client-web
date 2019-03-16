@@ -40,13 +40,11 @@ export function reducer(state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
-    case NEW_MESSAGE: {
-      console.log("new message", payload);
+    case NEW_MESSAGE:
       return {
         ...state,
         messages: [payload, ...state.messages]
       };
-    }
 
     case START_CHANNEL:
       return {
