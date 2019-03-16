@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import CSSModules from "react-css-modules";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import Wizard from "@snovosel/react-wizard";
 
 import {
   startChannel,
@@ -13,6 +12,7 @@ import {
 } from "../socket.js";
 
 import ChatRoom from "./ChatRoom/index.jsx";
+import ChatRegister from "./ChatRegister/index.jsx";
 
 import styles from "./index.styles.scss";
 
@@ -38,17 +38,8 @@ const mapDispatchToProps = dispatch =>
   );
 
 const signInSteps = [
-  () => (
-    <div styleName="input">
-      <span>
-        <p>
-          enter your <b>name</b>
-        </p>
-        <input styleName="text" />
-      </span>
-      <button styleName={`button active`}>ready</button>
-    </div>
-  ),
+  () => <ChatRegister stepName="name" />,
+  () => <ChatRegister stepName="room" />,
   () => (
     <div styleName="input">
       <span>
@@ -178,17 +169,7 @@ export class Chat extends Component {
     if (connected) {
       return <ChatRoom {...restProps} />;
     } else {
-      // return <div styleName="container">{this.renderStep()}</div>;
-      return (
-        <Wizard
-          steps={signInSteps}
-          callBack={state => console.log("state callback", state)}
-        >
-          {({ CurrentStep, ...restWizardValues }) => (
-            <CurrentStep {...restWizardValues} />
-          )}
-        </Wizard>
-      );
+      return <ChatRegister {...restProps} />;
     }
   }
 }

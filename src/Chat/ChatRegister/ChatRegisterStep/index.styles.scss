@@ -1,0 +1,48 @@
+.input {
+  width: 100%;
+  height: 45%;
+
+  margin-top: 15%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  button {
+    height: 35px;
+    width: 100%;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+
+  .back {
+    background-color: #cc6666;
+    border: none;
+    color: white;
+    border-radius: 2px;
+    height: 35px;
+    width: 100%;
+  }
+
+  p {
+    margin-bottom: 5px;
+    padding-left: 5px;
+  }
+
+  .text {
+    border-radius: 1px;
+    border: 0.7px solid #cccccc;
+    width: 99%;
+    height: 26px;
+
+    padding-left: 5px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
