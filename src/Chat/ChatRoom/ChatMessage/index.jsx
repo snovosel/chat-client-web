@@ -3,15 +3,15 @@ import CSSModules from "react-css-modules";
 
 import styles from "./index.styles.scss";
 
-const ChatMessage = ({ messageInfo: { message, name }, currentUser }) => (
-  <li styleName={name !== currentUser ? "left" : "right"} key={Math.random()}>
+const ChatMessage = ({ messageInfo: { message, username }, currentUser }) => (
+  <li styleName={username !== currentUser ? "left" : "right"}>
     <span>
       <p>{message}</p>
     </span>
-    <span styleName={name !== currentUser ? "left-name" : "right-name"}>
-      {name !== currentUser ? (
+    <span styleName={username !== currentUser ? "left-name" : "right-name"}>
+      {username !== currentUser ? (
         <p>
-          <b>{name}</b>
+          <b>{username}</b>
         </p>
       ) : null}
     </span>

@@ -1,8 +1,7 @@
 import { combineReducers } from "redux";
 
-// every feature should have its own reducer here
-import { reducer as socket } from "./socket.js";
+import { reducer as chat } from "./Chat/ducks.js";
 
 export const rootReducer = combineReducers({
-  socket
+  chat
 });

@@ -2,24 +2,18 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import {
-  startChannel,
-  sendMessage,
-  stopChannel,
-  setUsername,
-  clearUsername
-} from "../socket.js";
+import { startChannel, sendMessage, stopChannel } from "./ducks.js";
 
 import ChatRoom from "./ChatRoom/index.jsx";
 import ChatRegister from "./ChatRegister/index.jsx";
 
 const mapStateToProps = ({
-  socket: { messages, connected, room, username }
+  chat: { messages, connected, room, currentUser }
 }) => ({
   messages,
   connected,
   room,
-  username
+  currentUser
 });
 
 const mapDispatchToProps = dispatch =>
@@ -27,9 +21,7 @@ const mapDispatchToProps = dispatch =>
     {
       startChannel,
       sendMessage,
-      stopChannel,
-      setUsername,
-      clearUsername
+      stopChannel
     },
     dispatch
   );
