@@ -11,7 +11,7 @@ const ChatMessage = ({ messageInfo: { message, username }, currentUser }) => (
     <span styleName={username !== currentUser ? "left-name" : "right-name"}>
       {username !== currentUser ? (
         <p>
-          <b>{username}</b>
+          <b>{username}:</b>
         </p>
       ) : null}
     </span>
