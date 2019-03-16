@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import CSSModules from "react-css-modules";
 
+import ChatMessage from "./ChatMessage/index.jsx";
+
 import styles from "./index.styles.scss";
 
 class ChatRoom extends Component {
@@ -58,6 +60,7 @@ class ChatRoom extends Component {
 
   render() {
     const { room, messages } = this.props;
+    const { username } = this.props;
 
     return (
       <div styleName="container">
@@ -77,7 +80,9 @@ class ChatRoom extends Component {
             </div>
           </div>
           <ul styleName="message-list">
-            {messages.map(message => this.renderMessage(message))}
+            {messages.map(message => (
+              <ChatMessage currentUser={username} messageInfo={message} />
+            ))}
           </ul>
           <div styleName="message">
             <input
