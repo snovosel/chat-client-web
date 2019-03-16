@@ -4,7 +4,7 @@ Simple UI for chatroom application built with ReactJs and Socket.io-client
 
 ## Purpose
 
-Create and scale a chat application user-interface with minimal depencies and total package size
+Create and scale a chat application web user-interface with minimal depencies and total package size
 
 ### Getting started
 
