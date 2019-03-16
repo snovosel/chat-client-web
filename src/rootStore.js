@@ -1,24 +1,24 @@
-import { createStore, applyMiddleware } from 'redux';
-import createSagaMiddleware from 'redux-saga';
+import { createStore, applyMiddleware } from "redux";
+import createSagaMiddleware from "redux-saga";
 import { all } from "redux-saga/effects";
 
-import { rootReducer } from './rootReducer.js';
-import { watchers as landing } from 'Landing/sagas.js';
-import { socketWatchers } from './socket.js';
+import { rootReducer } from "./rootReducer.js";
+import { socketWatchers } from "./socket.js";
 
-const transform = watchers => watchers.map(watcher => watcher());
+// const transform = watchers => watchers.map(watcher => watcher());
 
 export function* rootSaga() {
-  yield all([
-    ...transform(landing),
-    socketWatchers(),
-  ]);
+  yield all([socketWatchers()]);
 }
 
 export function initializeStore(initialState) {
-  const sagaMiddleware = createSagaMiddleware()
+  const sagaMiddleware = createSagaMiddleware();
 
-  const store = createStore(rootReducer, initialState, applyMiddleware(sagaMiddleware));
+  const store = createStore(
+    rootReducer,
+    initialState,
+    applyMiddleware(sagaMiddleware)
+  );
 
   sagaMiddleware.run(rootSaga);
 
