@@ -1,33 +1,21 @@
-# React Template 
+# Chat - Web
 
-This is a base template for react projects to begin work on features rather than boilerplate code.
+Simple UI for chatroom application built with ReactJs and Socket.io-client
 
-This template comes natively with the following packages:
+# Purpose
 
-- Redux
-- Redux-saga
-- React-router
-- axios
-- react-css-modules with scss support
-- immutability helper
-
+Create and scale a chat application user-interface with minimal depencies and total package size
 
 # Getting started
 
-Fork off of this repo with your project name and then install all dependencies.
+Clone this repo and run the following commands:
 
 ```
-npm install && yarn 
-```
-
-
-To compile in a dev environment:
-```
-yarn start
+npm install && yarn
 ```
 
 To build for a production environment:
 
 ```
-npm run build 
+npm run build
 ```
