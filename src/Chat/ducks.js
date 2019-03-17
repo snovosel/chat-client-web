@@ -51,7 +51,7 @@ export function reducer(state = initialState, action) {
   }
 }
 
-export const getRoom = state => state.chat.room;
+export const getChatDetails = state => state.chat;
 
 export const startChannel = payload => ({ type: START_CHANNEL, payload });
 export const stopChannel = () => ({ type: STOP_CHANNEL });

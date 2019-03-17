@@ -16,11 +16,11 @@ import * as DUCKS from "./ducks.js";
 const socketServerURL = "localhost:8080";
 let socket;
 
-export const connect = payload => {
+export const connect = ({ currentUser, room }) => {
   socket = io(socketServerURL);
   return new Promise(resolve => {
     socket.on("connect", () => {
-      socket.emit("room", payload);
+      socket.emit("room", { name: currentUser, room });
       resolve(socket, "connect");
     });
   });
@@ -52,8 +52,8 @@ function* listenDisconnectSaga() {
 
 function* listenServerSaga() {
   try {
-    const room = yield select(DUCKS.getRoom);
-    const socket = yield call(connect, room);
+    const { room, currentUser } = yield select(DUCKS.getChatDetails);
+    const socket = yield call(connect, { room, currentUser });
     yield put({ type: DUCKS.CHANNEL_ON });
     const socketChannel = yield call(createSocketChannel, socket);
 
